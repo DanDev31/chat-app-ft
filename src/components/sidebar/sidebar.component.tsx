@@ -8,18 +8,17 @@ import { BsSearch } from "react-icons/bs";
 import { IoMdSettings } from "react-icons/io";
 import logo from "../../assets/logo.png"
 import { useAppDispatch } from "../../redux/hooks";
-import { logout } from "../../redux/slices/auth";
+import { logout } from "../../redux/slices/user";
 import { useNavigate } from "react-router-dom";
 
 interface SideBarProps {
   toggle:boolean;
   setToggle: React.Dispatch<React.SetStateAction<boolean>>;
-}
-
+};
 
 export const Sidebar = ({toggle, setToggle}:SideBarProps) => {
 
-  const [ switchMenu, setSwitchMenu ] = useState(false);
+  const [ switchMenu, setSwitchMenu ] = useState<boolean>(false);
 
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
@@ -77,6 +76,7 @@ export const Sidebar = ({toggle, setToggle}:SideBarProps) => {
             </div>
           </div>
         </div>
+        
     </div>
   )
 }

@@ -1,12 +1,12 @@
 import { instance } from "../axios"
 import config from "../config"
-import { UserCredentials } from "../redux/types/auth"
+import { UserCredentials } from "../redux/types"
 
 
 export const signUpRequest = async({name, email, password}:UserCredentials) => {
 
     try {
-        const response = await instance.post(`${config.app.api}/auth/register`, {
+        const response = await instance.post(`${config.app.api}auth/register`, {
             name,
             email,
             password
@@ -20,17 +20,14 @@ export const signUpRequest = async({name, email, password}:UserCredentials) => {
 
 
 export const signInRequest = async({email, password}:UserCredentials) => {
-
     try {
-        const response = await instance.post(`${config.app.api}/auth/login`, {
+        const response = await instance.post(`${config.app.api}auth/login`, {
             email,
             password
         });
         
         if(response.data.accessToken){
-
             return response.data;
-
         } else {
             console.log("Authentication Error")
         }

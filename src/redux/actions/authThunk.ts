@@ -1,6 +1,6 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { signUpRequest, signInRequest } from "../../services/auth.service";
-import { UserCredentials } from "../types/auth";
+import { UserCredentials } from "../types";
 
 
 export const signUp = createAsyncThunk("auth/userSignUp",

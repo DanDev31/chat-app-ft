@@ -3,7 +3,7 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import { AuthLayout } from "./auth-layout.component";
 import { IFormValues } from "../../interfaces/auth.interface";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
-import { signIn } from "../../redux/actions/auth-actions";
+import { signIn } from "../../redux/thunks/auth-thunk";
 import { useEffect } from "react";
 
 

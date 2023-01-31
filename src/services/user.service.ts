@@ -1,0 +1,24 @@
+import { instance } from "../axios";
+import config from "../config";
+
+export const getContactInfo = async(email:string) => {
+    try {
+        const response = await instance.get(`${config.app.api}users/getContactInfo/${email}`);
+        return response.data;
+    } catch (error) {
+        console.log('Error in getting contact info. ' + error);
+    }
+};
+
+
+export const AddNewContact = async(userId:string, contactEmail:string) => {
+    try {
+        const response = await instance.post(`${config.app.api}users/addContact`,{
+            userId,
+            contactEmail
+        });
+        return response.data;
+    } catch (error) {
+        console.log('Error adding a new contact. ' + error)
+    }
+};
