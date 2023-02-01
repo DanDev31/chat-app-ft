@@ -1,9 +1,11 @@
 import React, { useState } from "react";
 import { BsFillPersonPlusFill } from "react-icons/bs";
 import { BsSearch } from "react-icons/bs";
+import { FaPlusSquare } from "react-icons/fa";
 import { useAppSelector } from "../../redux/hooks";
-import { getContactInfo } from "../../services/user.service";
+import { AddNewContact, getContactInfo } from "../../services/user.service";
 import { PopUp } from "../ui/popup.component";
+import { Spinner } from "../ui/spinner/spinner.component";
 
 interface ContactListProps {
     switchMenu:boolean;
@@ -22,21 +24,40 @@ export const ContactList = ({ switchMenu, children }:ContactListProps) => {
     const [ openPopUp, setOpenPopUp ] = useState<boolean>(false);
     const [ loading, setLoading ] = useState<boolean>(false);
     const [ inputValue, setInputValue ] = useState<string>("");
+    const [ message, setMessage ] = useState<string>("");
     const [ contactInfo, setContactInfo ] = useState<ContactInfo>({
         id:"",
         name:"",
         email:""
     });
 
-
     const handleGetContactInfo = async(e:React.SyntheticEvent) => {
         e.preventDefault();
         setLoading(true);
-        const contact = await getContactInfo(inputValue);
+        const response = await getContactInfo(userId, inputValue);
         setLoading(false);
-        setContactInfo(contact);
+        if(response.success){
+            setContactInfo(response.contactInfo);
+        }else{
+            setMessage(response.message);
+        }
     };  
 
+    const handleAddContact = async() => {
+        setLoading(true);
+        try {
+            const response = await AddNewContact(userId, contactInfo.email);
+            if(response.success){
+                setMessage(response.message);
+            }else{
+                setMessage(response.message);
+            }
+        } catch (error) {
+        }
+        setLoading(false);
+    }
+
+    console.log(message)
 
   return (
     <div className=''>
@@ -56,25 +77,38 @@ export const ContactList = ({ switchMenu, children }:ContactListProps) => {
             (<PopUp
                 setClosePopUp={ setOpenPopUp }
             >
-               { !loading ? 
-               <form className='w-full' onSubmit={(e) => handleGetContactInfo(e)}>
-                    <div className='relative flex items-center justify-center'>
-                        <input
-                            type="email"
-                            placeholder='Enter a email..' 
-                            required
-                            className='w-full border-none rounded-md py-1 pl-1 outline-none text-gray-700'
+                { contactInfo.name.length === 0 ?
+                    (<form className='w-full' onSubmit={(e) => handleGetContactInfo(e)}>
+                        <div className='flex items-center flex-col'>
+                            <h1 className='mb-2 font-semibold text-[20px]'>Search your contact here.</h1>
+                            <div className='relative w-full flex items-center'>
+                                <input
+                                    type="email"
+                                    placeholder='Enter a email..' 
+                                    required
+                                    className='w-full border-none rounded-full py-1 pl-2 outline-none text-gray-700'
 
-                            onChange={(e) => setInputValue(e.target.value)}
-                        />
-                        <button type='submit' className='bg-slate-900 hover:bg-slate-800 absolute top-0 bottom-0 right-0 border-none cursor-pointer rounded-md px-3'>
-                            <BsSearch className='text-gray-100'/>
-                        </button>
-                    </div>
-                </form>
-                :
-                <p>Loading...</p>
+                                    onChange={(e) => setInputValue(e.target.value)}
+                                />
+                                <button type='submit' className='bg-slate-900 flex items-center justify-center hover:bg-slate-800 absolute right-[1.5px] border-none cursor-pointer rounded-full p-[7px]'>
+                                    <BsSearch className='text-gray-100'/>
+                                </button>
+                            </div>
+                        </div>
+                    </form>)
+                    :
+                    !loading ? 
+                        <div className="flex items-center justify-between gap-2 w-full border-solid border-b-2 border-neutral-100 pb-2">
+                            <h3>{contactInfo.name}</h3>
+                            <button 
+                                className='bg-slate-900 border-none outline-none cursor-pointer rounded-lg px-3 py-1'
+                                onClick={() => handleAddContact()}
+                            >add</button>
+                        </div>
+                    :
+                    <Spinner/>
                 }
+
             </PopUp>)
         }
     </div>

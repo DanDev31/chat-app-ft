@@ -1,9 +1,9 @@
 import { instance } from "../axios";
 import config from "../config";
 
-export const getContactInfo = async(email:string) => {
+export const getContactInfo = async(userId:string, email:string) => {
     try {
-        const response = await instance.get(`${config.app.api}users/getContactInfo/${email}`);
+        const response = await instance.get(`${config.app.api}users/getContactInfo?userId=${userId}&email=${email}`);
         return response.data;
     } catch (error) {
         console.log('Error in getting contact info. ' + error);
