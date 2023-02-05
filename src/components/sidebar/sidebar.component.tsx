@@ -1,24 +1,24 @@
 import { useState } from "react";
-import { RecentItem } from "./recent-item.component";
-import { ContactList } from "./contact-list.component";
+import { useNavigate } from "react-router-dom";
+import { useAppDispatch, useAppSelector } from "../../redux/hooks";
+import { Contact } from "../contacts/contact.component";
+import { ContactList } from "../contacts/contact-list.component";
 import { SwitchMenuButton } from "./switch-menu.component";
-
+import { logout } from "../../redux/slices/user";
 import { IoIosLogOut } from "react-icons/io";
 import { BsSearch } from "react-icons/bs";
 import { IoMdSettings } from "react-icons/io";
+
 import logo from "../../assets/logo.png"
-import { useAppDispatch } from "../../redux/hooks";
-import { logout } from "../../redux/slices/user";
-import { useNavigate } from "react-router-dom";
+import { Settings } from "../settings/settings.component";
 
-interface SideBarProps {
-  toggle:boolean;
-  setToggle: React.Dispatch<React.SetStateAction<boolean>>;
-};
+interface SideBarProps {};
 
-export const Sidebar = ({toggle, setToggle}:SideBarProps) => {
+export const Sidebar = () => {
 
+  const { contacts } = useAppSelector(state => state.app.user.userInfo);
   const [ switchMenu, setSwitchMenu ] = useState<boolean>(false);
+  const [ openSettings, setOpenSettings ] = useState<boolean>(false);
 
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
@@ -28,13 +28,14 @@ export const Sidebar = ({toggle, setToggle}:SideBarProps) => {
     navigate('/');
   };
 
+
   return (
-    <div className='py-2 px-4 bg-slate-900  w-full md:w-[350px] h-full'>
+    <div className='py-2 px-4 bg-slate-900 w-full md:w-[450px] h-full relative'>
         <div className='flex items-center'>
             <div className='w-[100px]'>
                 <img src={logo} alt="" />
             </div>
-            <h3 onClick={ () => setToggle(!toggle)}>ChatMe</h3>
+            <h3>ChatMe</h3>
         </div>
         <div className='flex justify-center items-center w-full border-b-2 border-slate-400 pb-4 relative'>
             <input type="text" className='w-full bg-slate-300 border-none
@@ -52,16 +53,26 @@ export const Sidebar = ({toggle, setToggle}:SideBarProps) => {
               switchMenu={ switchMenu }
             >
               {
-                [1,2,3,4].map((e,i) => (
-                  <RecentItem key={i}/>
+                contacts.length > 0 ?
+                contacts?.map((contact,i) => (
+                  <Contact 
+                    key={i}
+                    {...contact}
+                  />
                 ))
+
+                :
+                <h2>You don't have any friend yet. Add some! </h2>
               }
             </ContactList>
             
           </div>
 
           <div>
-            <div className='flex items-center gap-4 cursor-pointer mb-2'>
+            <div 
+              className='flex items-center gap-4 cursor-pointer mb-2'
+              onClick={() => setOpenSettings(true)}
+            >
               <IoMdSettings className='text-xl'/>
               <h3>Settings</h3>
             </div>
@@ -76,7 +87,10 @@ export const Sidebar = ({toggle, setToggle}:SideBarProps) => {
             </div>
           </div>
         </div>
-        
+        <Settings
+            openSettings={openSettings}
+            setOpenSettings={setOpenSettings}
+          />
     </div>
   )
 }

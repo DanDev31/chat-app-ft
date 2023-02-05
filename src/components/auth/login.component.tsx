@@ -1,7 +1,7 @@
 import { Link, useNavigate } from "react-router-dom"
 import { useForm, SubmitHandler } from "react-hook-form";
 import { AuthLayout } from "./auth-layout.component";
-import { IFormValues } from "../../interfaces/auth.interface";
+import { IFormValues } from "../../interfaces/user.interface";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { signIn } from "../../redux/thunks/auth-thunk";
 import { useEffect } from "react";
@@ -11,7 +11,7 @@ export const Login = () => {
 
   const { register, handleSubmit, watch, formState: { errors }, reset } = useForm<IFormValues>();
   const dispatch = useAppDispatch();
-  const { success } = useAppSelector(state => state.auth);
+  const { success } = useAppSelector(state => state.app.user);
   const navigate = useNavigate();
 
   const onSubmit: SubmitHandler<IFormValues> = async(data) => {

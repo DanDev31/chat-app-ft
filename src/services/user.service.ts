@@ -19,6 +19,15 @@ export const AddNewContact = async(userId:string, contactEmail:string) => {
         });
         return response.data;
     } catch (error) {
-        console.log('Error adding a new contact. ' + error)
+        console.log('Error adding a new contact. ' + error);
     }
 };
+
+export const getContacts = async(userId:string) => {
+    try {
+        const response = await instance.get(`${config.app.api}users/getUserContacts/${userId}`);
+        return response.data;
+    } catch (error) {
+        console.log('Error adding a new contact. ' + error);
+    }
+}; 

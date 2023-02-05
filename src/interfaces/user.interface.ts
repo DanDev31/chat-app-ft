@@ -3,13 +3,10 @@ export interface IUser {
     id:string;
     name:string;
     email:string;
-    contacts:UserContacts[];
+    contacts:IContact[];
 };
 
-export type UserContacts = {
-    id:string;
-    email:string;
-}
+export interface IContact extends Omit<IUser, 'contacts'>{}; 
 
 export interface AuthUser {
     userInfo:IUser;

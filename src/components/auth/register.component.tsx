@@ -1,6 +1,6 @@
 import { useForm, SubmitHandler } from "react-hook-form";
 import { Link } from "react-router-dom"
-import { IFormValues } from "../../interfaces/auth.interface";
+import { IFormValues } from "../../interfaces/user.interface";
 import { signUp } from "../../redux/thunks/auth-thunk";
 import { useAppDispatch } from "../../redux/hooks";
 import { AuthLayout } from "./auth-layout.component"

@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { BsFillPersonPlusFill } from "react-icons/bs";
 import { BsSearch } from "react-icons/bs";
-import { FaPlusSquare } from "react-icons/fa";
-import { useAppSelector } from "../../redux/hooks";
+import { useAppDispatch, useAppSelector } from "../../redux/hooks";
+import { getUserContactsThunk } from "../../redux/thunks/user-thunk";
 import { AddNewContact, getContactInfo } from "../../services/user.service";
 import { PopUp } from "../ui/popup.component";
 import { Spinner } from "../ui/spinner/spinner.component";
@@ -13,31 +13,37 @@ interface ContactListProps {
 };
 
 type ContactInfo = {
-    id:string,
-    name:string,
-    email:string
+    id:string;
+    name:string;
+    email:string;
+    isFound:boolean;
 };
 
 export const ContactList = ({ switchMenu, children }:ContactListProps) => {
 
-    const { id:userId } = useAppSelector(state => state.auth.userInfo);
+    const { id:userId } = useAppSelector(state => state.app.user.userInfo);
     const [ openPopUp, setOpenPopUp ] = useState<boolean>(false);
     const [ loading, setLoading ] = useState<boolean>(false);
+    const [ hideForm, setHideForm ] = useState<boolean>(false);
     const [ inputValue, setInputValue ] = useState<string>("");
     const [ message, setMessage ] = useState<string>("");
     const [ contactInfo, setContactInfo ] = useState<ContactInfo>({
         id:"",
         name:"",
-        email:""
+        email:"",
+        isFound:false
     });
+
+    const dispatch = useAppDispatch();
 
     const handleGetContactInfo = async(e:React.SyntheticEvent) => {
         e.preventDefault();
+        setHideForm(true);
         setLoading(true);
         const response = await getContactInfo(userId, inputValue);
         setLoading(false);
         if(response.success){
-            setContactInfo(response.contactInfo);
+            setContactInfo({...response.contactInfo, isFound:true});
         }else{
             setMessage(response.message);
         }
@@ -48,16 +54,16 @@ export const ContactList = ({ switchMenu, children }:ContactListProps) => {
         try {
             const response = await AddNewContact(userId, contactInfo.email);
             if(response.success){
+                setContactInfo({...contactInfo, isFound:false});
                 setMessage(response.message);
+                await dispatch(getUserContactsThunk(userId));
             }else{
                 setMessage(response.message);
             }
         } catch (error) {
         }
         setLoading(false);
-    }
-
-    console.log(message)
+    };
 
   return (
     <div className=''>
@@ -76,8 +82,9 @@ export const ContactList = ({ switchMenu, children }:ContactListProps) => {
         { openPopUp && 
             (<PopUp
                 setClosePopUp={ setOpenPopUp }
+                additionalState={ setHideForm }
             >
-                { contactInfo.name.length === 0 ?
+                { !hideForm ?
                     (<form className='w-full' onSubmit={(e) => handleGetContactInfo(e)}>
                         <div className='flex items-center flex-col'>
                             <h1 className='mb-2 font-semibold text-[20px]'>Search your contact here.</h1>
@@ -98,13 +105,16 @@ export const ContactList = ({ switchMenu, children }:ContactListProps) => {
                     </form>)
                     :
                     !loading ? 
-                        <div className="flex items-center justify-between gap-2 w-full border-solid border-b-2 border-neutral-100 pb-2">
+                        contactInfo.isFound ?
+                       ( <div className="flex items-center justify-between gap-2 w-full border-solid border-b-2 border-neutral-100 pb-2">
                             <h3>{contactInfo.name}</h3>
                             <button 
                                 className='bg-slate-900 border-none outline-none cursor-pointer rounded-lg px-3 py-1'
                                 onClick={() => handleAddContact()}
                             >add</button>
-                        </div>
+                        </div>)
+                        :
+                        <h2>{message}</h2>
                     :
                     <Spinner/>
                 }

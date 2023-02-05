@@ -1,6 +1,8 @@
-import { configureStore } from "@reduxjs/toolkit";
+import { configureStore, combineReducers } from "@reduxjs/toolkit";
 import { persistReducer, persistStore } from 'redux-persist';
-import authReducer from "../slices/user";
+import userReducer from "../slices/user";
+import contactReducer from "../slices/contact";
+import appSlice from "../slices/app";
 import storage from 'redux-persist/lib/storage';
 
 
@@ -10,11 +12,17 @@ const persistConfig = {
     sessionStorage
   };
 
-const persistedReducer = persistReducer(persistConfig, authReducer)
+  const reducers = combineReducers({
+    user:userReducer,
+    contact:contactReducer,
+    app:appSlice
+  });
+
+const persistedReducer = persistReducer(persistConfig, reducers);
 
 export const store = configureStore({
     reducer:{
-        auth:persistedReducer
+        app:persistedReducer
     },
     devTools: import.meta.env.NODE_ENV !== 'production',
     middleware: (getDefaultMiddleware) => getDefaultMiddleware({

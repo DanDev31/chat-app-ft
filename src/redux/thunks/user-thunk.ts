@@ -1,5 +1,5 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { AddNewContact } from "../../services/user.service";
+import { AddNewContact, getContacts } from "../../services/user.service";
 import { NewContact } from "../types";
 
 
@@ -12,4 +12,15 @@ export const AddNewContactThunk = createAsyncThunk('user/addNewContact',
             rejectWithValue(error);
         }
     } 
-)
+);
+
+export const getUserContactsThunk = createAsyncThunk('user/getContacts', 
+    async(userId:string, { rejectWithValue }) => {
+        try {
+            const response = await getContacts(userId);
+            return response;
+        } catch (error) {
+            rejectWithValue(error);
+        }
+    } 
+);

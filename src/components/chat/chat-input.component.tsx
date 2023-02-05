@@ -1,7 +1,8 @@
 import { GrEmoji } from "react-icons/gr";
 import { AiOutlinePaperClip } from "react-icons/ai";
 import { MdSend } from "react-icons/md";
-import React, { useRef } from "react";
+import React, { useEffect, useRef } from "react";
+import { useAppSelector } from "../../redux/hooks";
 
 
 interface ChatInputProps {
@@ -12,14 +13,21 @@ interface ChatInputProps {
 
 export const ChatInput = ({message, setMessage, socket}:ChatInputProps) => {
 
+  const { id:contactId } = useAppSelector(state => state.app.contact);  
   const inputRef = useRef<any>(null);
+
 
   const handleSubmit = (e:React.FormEvent) => {
     e.preventDefault();
-    socket.emit('message', message);
+    socket.emit('message', {message, contactId, socketId:socket.id});
     inputRef.current.value = '';
-    
-  }
+  };
+
+  useEffect(() => {
+    socket.on('serverMessage', (message:object)=> {
+      console.log(message);
+    })
+  },[]);
 
   return (
     <form className='bg-slate-100 border-t-2 flex items-center justify-between gap-6 p-4 w-full' onSubmit={handleSubmit}>
