@@ -3,31 +3,41 @@ import { AiOutlinePaperClip } from "react-icons/ai";
 import { MdSend } from "react-icons/md";
 import React, { useEffect, useRef } from "react";
 import { useAppSelector } from "../../redux/hooks";
-
+import { ChatMessage } from "../../interfaces/user.interface";
+import moment from "moment";
 
 interface ChatInputProps {
   message:string;
   setMessage: React.Dispatch<React.SetStateAction<string>>;
+  setChatMessages:React.Dispatch<React.SetStateAction<ChatMessage[]>>;
   socket: any;
 }
 
-export const ChatInput = ({message, setMessage, socket}:ChatInputProps) => {
+export const ChatInput = ({message, setMessage, setChatMessages, socket}:ChatInputProps) => {
 
   const { id:contactId } = useAppSelector(state => state.app.contact);  
+  const { id:userId, name } = useAppSelector(state => state.app.user.userInfo);  
   const inputRef = useRef<any>(null);
 
 
   const handleSubmit = (e:React.FormEvent) => {
     e.preventDefault();
-    socket.emit('message', {message, contactId, socketId:socket.id});
+    setChatMessages(prev => {
+      return [
+        ...prev,
+        {
+          id:userId,
+          date: moment().format('hh:mm'),
+          message,
+          isReaded:false
+        }
+      ]
+    });
+    socket.emit('message', {userId, contactId, message});
     inputRef.current.value = '';
   };
 
-  useEffect(() => {
-    socket.on('serverMessage', (message:object)=> {
-      console.log(message);
-    })
-  },[]);
+ 
 
   return (
     <form className='bg-slate-100 border-t-2 flex items-center justify-between gap-6 p-4 w-full' onSubmit={handleSubmit}>

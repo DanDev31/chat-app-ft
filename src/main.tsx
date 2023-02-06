@@ -9,11 +9,10 @@ import './index.css'
 
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
-  <React.StrictMode>
+ 
     <PersistGate loading={null} persistor={ persistor }>
       <Provider store={store}>
         <RouterProvider router={ router } />
       </Provider>
     </PersistGate>
-  </React.StrictMode>,
 )

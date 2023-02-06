@@ -21,3 +21,10 @@ export interface IFormValues {
     email:string;
     password:string;
 };
+
+export type ChatMessage = {
+    id:string;
+    date:string;
+    message:string;
+    isReaded:boolean;
+};
