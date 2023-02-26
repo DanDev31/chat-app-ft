@@ -1,23 +1,49 @@
-import profilePic from "../../assets/profile-pic.png";
+import { useState, useEffect } from "react";
 import { useAppDispatch } from "../../redux/hooks";
-import { setToggleChat } from "../../redux/slices/app";
+import { setToggleChat, startChat } from "../../redux/slices/app";
 import { setContactInfo } from "../../redux/slices/contact";
+import { instance } from "../../axios";
+import profilePic from "../../assets/profile-pic.png";
+import { IContact } from "../../interfaces/user.interface";
 
 interface RecentItemProps {
-  _id:string;
-  name:string;
-  email:string;
-  message?:string;
+  contactId:string;
+  conversationId?:string;
 };
 
-export const Contact = ({_id:id, name, email, message}:RecentItemProps) => {
+export const Contact = ({contactId, conversationId}:RecentItemProps) => {
 
+  const [contact, setContact] = useState<IContact>();
   const dispatch = useAppDispatch();
 
   const handleContactActions = () => {
     dispatch(setToggleChat());
-    dispatch(setContactInfo({id, name, email}));
+    if(conversationId){
+      dispatch(startChat(conversationId));
+    }else{
+      dispatch(startChat());
+    }
+    if(contact){
+        dispatch(setContactInfo({
+          _id:contact?._id,
+          email:contact?.email,
+          name:contact?.name
+        }));
+    }
   };
+
+  useEffect(() => {
+    const getContactInfo = async() => {
+      try {
+        const response = await instance.get(`/users/getUser/${contactId}`);
+       setContact(response.data);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    getContactInfo();
+  }, []);
+
   
   return (
     <div 
@@ -28,8 +54,7 @@ export const Contact = ({_id:id, name, email, message}:RecentItemProps) => {
             <img src={ profilePic } alt="Profile Picture" />
         </div>
         <div className='flex flex-col'>
-            <h5 className='font-bold'>{name}</h5>
-            {message && <p className='text-[14px]'>message</p>}
+            <h5 className='font-bold'>{contact?.name}</h5>
         </div>
     </div>
   )

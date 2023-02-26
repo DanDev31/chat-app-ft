@@ -6,7 +6,7 @@ import { setToggleChat } from '../../redux/slices/app';
 
 export const ChatTopBar = () => {
 
-  const { name:contactName } = useAppSelector(state => state.app.contact); 
+  const { name:contactName } = useAppSelector(state => state.contact); 
   const dispatch = useAppDispatch();
 
   return (

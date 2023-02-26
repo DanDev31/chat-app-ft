@@ -14,16 +14,17 @@ export const ChatMessagesArea = ({chatMessages}:ChatAreaProps) => {
         <div className='flex flex-col justify-end h-full gap-2 p-3'>
           {
             chatMessages?.length > 0 ? 
-            chatMessages?.map((message, i) =>(
+            chatMessages?.map((el, i) =>(
               <Message
                 key={i}
-                {...message}
+                id={el.userId}
+                message={el.text}
               />
             ))
             :
-            <div>
-              <TbMessageCircle />
-              <p>You don't have any message from this user. Start a conversation!</p>
+            <div className='h-full flex gap-2 flex-col items-center justify-center text-slate-400'>
+              <TbMessageCircle className='text-[70px]'/>
+              <h2 className='text-[20px]'>You don't have a conversation with this person. Start one!</h2>
             </div>
           }
         </div>

@@ -3,7 +3,7 @@ import { IContact } from "../../interfaces/user.interface";
 
 
 const initialState:IContact = {
-    id:"",
+    _id:"",
     name:"",
     email:""
 };
@@ -13,7 +13,7 @@ const contactSlice = createSlice({
     initialState,
     reducers:{
         setContactInfo(state, {payload}:PayloadAction<IContact>){
-            state.id=payload.id;
+            state._id=payload._id;
             state.name=payload.name;
             state.email=payload.email;
         }

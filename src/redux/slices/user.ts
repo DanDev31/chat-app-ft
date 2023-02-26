@@ -1,21 +1,18 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { AuthUser } from "../../interfaces/user.interface";
 import { signUp, signIn } from "../thunks/auth-thunk";  
-import { getUserContactsThunk } from "../thunks/user-thunk";
+import { getUserContactsThunk, getUserConversationsThunk } from "../thunks/user-thunk";
 
+
+const user = JSON.parse(localStorage.getItem("user") || "{}");
 
 const initialState:AuthUser = {
-    userInfo:{
-        id:"",
-        name:"",
-        email:"",
-        contacts:[] 
-    },
+    userInfo:user,
     userToken:"",
     loading:false,
     success:false,
     error:null
-}
+};
 
 
 const authSlice = createSlice({
@@ -28,7 +25,7 @@ const authSlice = createSlice({
                 id:"",
                 name:"",
                 email:"",
-                contacts:[] 
+                contacts:[]
             },
             state.userToken=""
             state.loading=false
@@ -58,7 +55,7 @@ const authSlice = createSlice({
         builder.addCase(signIn.fulfilled, (state, { payload }) => {
             state.loading = false;
             state.success = true;
-            state.userInfo = payload.userInfo;
+            state.userInfo = payload;
             state.userToken = payload.accessToken;
         })
         builder.addCase(signIn.rejected, (state, { payload }) => {
@@ -79,6 +76,21 @@ const authSlice = createSlice({
         builder.addCase(getUserContactsThunk.rejected, (state, { payload }) => {
             state.loading = false;
             state.userInfo.contacts = [];
+            state.error = payload;
+        })
+
+        //getUserConversations 
+
+        builder.addCase(getUserConversationsThunk.pending, (state) => {
+            state.loading = true;
+            state.error = null;
+        })
+        builder.addCase(getUserConversationsThunk.fulfilled, (state, { payload }) => {
+            state.loading = false;
+            state.success = true;
+        })
+        builder.addCase(getUserConversationsThunk.rejected, (state, { payload }) => {
+            state.loading = false;
             state.error = payload;
         })
     }

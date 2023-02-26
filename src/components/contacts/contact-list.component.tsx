@@ -21,7 +21,7 @@ type ContactInfo = {
 
 export const ContactList = ({ switchMenu, children }:ContactListProps) => {
 
-    const { id:userId } = useAppSelector(state => state.app.user.userInfo);
+    const { id:userId } = useAppSelector(state => state.user.userInfo);
     const [ openPopUp, setOpenPopUp ] = useState<boolean>(false);
     const [ loading, setLoading ] = useState<boolean>(false);
     const [ hideForm, setHideForm ] = useState<boolean>(false);

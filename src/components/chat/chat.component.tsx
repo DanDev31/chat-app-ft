@@ -6,6 +6,7 @@ import { ChatMessagesArea } from './chat-messages-area.component';
 import { ChatTopBar } from './chat-topbar.component';
 import { ChatMessage } from '../../interfaces/user.interface';
 import config from '../../config';
+import { instance } from '../../axios';
 
 interface ChatProps {
     
@@ -15,30 +16,26 @@ interface ChatProps {
   
   export const Chat = () => {
 
-    const { id:userId } = useAppSelector(state => state.app.user.userInfo);
-    const { toggleChat } = useAppSelector(state => state.app.app);
+    const { id:userId } = useAppSelector(state => state.user.userInfo);
+    const { toggleChat, conversationId } = useAppSelector(state => state.app);
     const [ chatMessages, setChatMessages ] = useState<ChatMessage[]>([]);
     const [message, setMessage] = useState('');
 
     useEffect(() => {
       socket.emit('addUser', userId);
-      socket.on('message', (message:ChatMessage) => {
-        console.log("message",message)
-        setChatMessages(prev => {
-          return [
-            ...prev,
-            {
-              id:message.id,
-              date: message.date,
-              message:message.message,
-              isReaded:false
-            }
-          ]
-        });
-      })
     },[]);
 
-    console.log(chatMessages)
+    useEffect(() => {
+      const getMessages = async() => {
+        try {
+          const response = await instance.get(`message/getMessages/${conversationId}`);
+          setChatMessages(response.data);
+        } catch (error) {
+          console.log(error);
+        }
+      };
+      getMessages();
+    },[conversationId]);
     
   return (
     <div className={`z-40 absolute -bottom-full flex flex-col justify-between md:static text-slate-900 w-full h-full ${ toggleChat ? 'top-0 animate-slideBottom' : null } `}>

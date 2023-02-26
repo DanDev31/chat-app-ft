@@ -11,7 +11,7 @@ export const Login = () => {
 
   const { register, handleSubmit, watch, formState: { errors }, reset } = useForm<IFormValues>();
   const dispatch = useAppDispatch();
-  const { success } = useAppSelector(state => state.app.user);
+  const { success } = useAppSelector(state => state.user);
   const navigate = useNavigate();
 
   const onSubmit: SubmitHandler<IFormValues> = async(data) => {

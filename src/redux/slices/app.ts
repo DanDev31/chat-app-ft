@@ -1,11 +1,15 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 export interface IApp {
     toggleChat:boolean;
+    startChat:boolean;
+    conversationId:string;
 };
 
 const initialState:IApp = {
-    toggleChat:false
+    toggleChat:false,
+    startChat:false,
+    conversationId:""
 };
 
 const appSlice = createSlice({
@@ -14,9 +18,15 @@ const appSlice = createSlice({
     reducers:{
         setToggleChat(state){
             state.toggleChat=!state.toggleChat;
+        },
+        startChat(state, {payload}:PayloadAction<string | undefined>){
+            state.startChat = true;
+            if(payload){
+                state.conversationId=payload;
+            }
         }
     }
 });
 
-export const { setToggleChat } = appSlice.actions;
+export const { setToggleChat, startChat } = appSlice.actions;
 export default appSlice.reducer;

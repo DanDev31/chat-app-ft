@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { Contact } from "../contacts/contact.component";
@@ -8,15 +8,17 @@ import { logout } from "../../redux/slices/user";
 import { IoIosLogOut } from "react-icons/io";
 import { BsSearch } from "react-icons/bs";
 import { IoMdSettings } from "react-icons/io";
-
-import logo from "../../assets/logo.png"
+import { instance } from "../../axios";
 import { Settings } from "../settings/settings.component";
+import { IConversation } from "../../interfaces/user.interface";
+import logo from "../../assets/logo.png";
 
 interface SideBarProps {};
 
 export const Sidebar = () => {
 
-  const { contacts } = useAppSelector(state => state.app.user.userInfo);
+  const { id, contacts } = useAppSelector(state => state.user.userInfo);
+  const [conversations, setConversations] = useState<IConversation[]>([]);
   const [ switchMenu, setSwitchMenu ] = useState<boolean>(false);
   const [ openSettings, setOpenSettings ] = useState<boolean>(false);
 
@@ -28,6 +30,19 @@ export const Sidebar = () => {
     navigate('/');
   };
 
+  useEffect(() => {
+    const getConversations = async() => {
+      try {
+        const response = await instance.get(`/conversation/getConversations/${id}`);
+        console.log("res", response.data);
+
+        setConversations(response.data);
+      } catch (error) {
+        console.log(error)
+      }
+    };
+    getConversations();
+  }, []);
 
   return (
     <div className='py-2 px-4 bg-slate-900 w-full md:w-[450px] h-full relative'>
@@ -49,22 +64,44 @@ export const Sidebar = () => {
               setSwitchMenu={ setSwitchMenu }
             />
 
-            <ContactList
-              switchMenu={ switchMenu }
-            >
-              {
-                contacts.length > 0 ?
-                contacts?.map((contact,i) => (
-                  <Contact 
-                    key={i}
-                    {...contact}
-                  />
-                ))
-
-                :
-                <h2>You don't have any friend yet. Add some! </h2>
-              }
-            </ContactList>
+            {
+              switchMenu ? (
+                <ContactList
+                switchMenu={ switchMenu }
+              >
+                {
+                  contacts?.length > 0 ?
+                  contacts?.map((contact,i) => (
+                    <Contact 
+                      key={i}
+                      contactId={contact._id}
+                    />
+                  ))
+                  :
+                  <h2>You don't have any friend yet. Add some! </h2>
+                }
+              </ContactList>
+              )
+              :
+              (
+                <>
+                  {
+                    conversations?.length > 0 ?
+                    conversations.map((el, i) => (
+                      <Contact 
+                        key={i}
+                        conversationId={el._id}
+                        contactId={el.contactId}
+                    />
+                    ))
+                    :
+                    <div>There's no recent conversations.</div>
+                    
+                  }
+                </>
+              )
+            }
+           
             
           </div>
 

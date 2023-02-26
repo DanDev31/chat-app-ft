@@ -6,7 +6,24 @@ export interface IUser {
     contacts:IContact[];
 };
 
-export interface IContact extends Omit<IUser, 'contacts'>{}; 
+export interface IContact {
+    _id:string;
+    name:string;
+    email:string;
+}
+
+export interface IConversation {
+    _id:string;
+    userId:string;
+    contactId:string;
+};
+
+export interface IMessage {
+    id:string;
+    text:string;
+    date:Date;
+    wasReaded:boolean;
+};
 
 export interface AuthUser {
     userInfo:IUser;
@@ -23,8 +40,9 @@ export interface IFormValues {
 };
 
 export type ChatMessage = {
-    id:string;
-    date:string;
-    message:string;
-    isReaded:boolean;
+    _id:string;
+    userId:string;
+    conversationId:string;
+    text:string;
+    wasReaded:boolean;
 };

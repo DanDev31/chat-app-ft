@@ -1,10 +1,10 @@
+import React, { useRef } from "react";
 import { GrEmoji } from "react-icons/gr";
 import { AiOutlinePaperClip } from "react-icons/ai";
 import { MdSend } from "react-icons/md";
-import React, { useEffect, useRef } from "react";
 import { useAppSelector } from "../../redux/hooks";
 import { ChatMessage } from "../../interfaces/user.interface";
-import moment from "moment";
+import { instance } from "../../axios";
 
 interface ChatInputProps {
   message:string;
@@ -15,29 +15,37 @@ interface ChatInputProps {
 
 export const ChatInput = ({message, setMessage, setChatMessages, socket}:ChatInputProps) => {
 
-  const { id:contactId } = useAppSelector(state => state.app.contact);  
-  const { id:userId, name } = useAppSelector(state => state.app.user.userInfo);  
+  const { _id:contactId } = useAppSelector(state => state.contact);  
+  const { conversationId } = useAppSelector(state => state.app);
+  const { id:userId } = useAppSelector(state => state.user.userInfo);  
   const inputRef = useRef<any>(null);
 
+  const storeMessages = async() => {
+    try {
+        const response = await instance.post('/message/newMessage', {
+          userId,
+          conversationId,
+          text:message,
+          wasReaded:false
+        });
+
+        setChatMessages(prev => {
+          return [
+            ...prev,
+            response.data
+          ]
+        });
+    } catch (error) {
+      console.log(error);
+    }
+  }; 
 
   const handleSubmit = (e:React.FormEvent) => {
     e.preventDefault();
-    setChatMessages(prev => {
-      return [
-        ...prev,
-        {
-          id:userId,
-          date: moment().format('hh:mm'),
-          message,
-          isReaded:false
-        }
-      ]
-    });
+    storeMessages();
     socket.emit('message', {userId, contactId, message});
     inputRef.current.value = '';
   };
-
- 
 
   return (
     <form className='bg-slate-100 border-t-2 flex items-center justify-between gap-6 p-4 w-full' onSubmit={handleSubmit}>
